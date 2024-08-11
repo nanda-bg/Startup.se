@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% load static %}
+{% block 'head' %}
+
+	<link rel="stylesheet" href="{% static 'empresarios/css/listar_empresas.css' %}">
+	<link rel="stylesheet" href="{% static 'empresarios/css/empresa.css' %}">
+	<link rel="stylesheet" href="{% static 'usuarios/css/usuarios.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap-icons.css">
+
+	
+{% endblock 'head' %}
+
+
+{% block 'body' %}
+    {% include "partials/barra_navegacao.html" %}
+    <br><br>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-7">
+                <div class="row">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <section class="alert {{message.tags}}">
+                                {{message}}
+            
+                            </section>
+                        {% endfor %}
+                    {% endif %}
+                    <div class="col-md-3">
+                        <img src="{{empresa.logo.url}}" class="foto-empresa" alt="">
+                    </div>
+                    <div class="col-md">
+                        <h3>{{empresa.nome}}</h3>
+                        <span class="badge bg-primary">{{empresa.get_area_display}}</span>
+                    </div>
+                    
+                </div>
+                <br><br>
+                <div class="progress" wtyle="80%">
+                    <div class="progress-bar bg-success"
+                         style="width:{{percentual_vendido}}%"></div>
+                </div>
+                <br>
+                {% if concretizado %}
+                
+                    <span class="badge bg-success">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
+                            <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/>
+                        </svg>
+                    </span>
+
+                    <span>&nbsp &nbsp A empresa já atingiu 80% do percentual captado, portanto seu investimento será concretizado.</span>
+                {% else %}
+
+                   <span class="badge bg-warning">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-hourglass-split" viewBox="0 0 16 16">
+                            <path d="M2.5 15a.5.5 0 1 1 0-1h1v-1a4.5 4.5 0 0 1 2.557-4.06c.29-.139.443-.377.443-.59v-.7c0-.213-.154-.451-.443-.59A4.5 4.5 0 0 1 3.5 3V2h-1a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-1v1a4.5 4.5 0 0 1-2.557 4.06c-.29.139-.443.377-.443.59v.7c0 .213.154.451.443.59A4.5 4.5 0 0 1 12.5 13v1h1a.5.5 0 0 1 0 1zm2-13v1c0 .537.12 1.045.337 1.5h6.326c.216-.455.337-.963.337-1.5V2zm3 6.35c0 .701-.478 1.236-1.011 1.492A3.5 3.5 0 0 0 4.5 13s.866-1.299 3-1.48zm1 0v3.17c2.134.181 3 1.48 3 1.48a3.5 3.5 0 0 0-1.989-3.158C8.978 9.586 8.5 9.052 8.5 8.351z"/>
+                        </svg>
+                   </span>
+                   
+                   <span>&nbsp &nbsp Seu investimento será concretizado caso a empresa atinja pelo meno 80% do valor esperado até a data final.</span>
+               {% endif %}
+
+                <hr>
+                <p>{{empresa.descricao}}</p>
+                <div class="col-md">
+                    <h5>Valuation esperado</h5>
+                    <span class="sub-fonte">Esperado: {{valuation_esperado}}</span>
+                    <br>
+                    <br>
+                    <h5>Percentual</h5>
+                    <span class="sub-fonte">Total a venda: {{empresa.percentual_equity}}%</span>
+                    <br>
+                    <span class="sub-fonte">Disponivel à compra:{{percentual_disponivel}}%</span>
+                </div>
+                <br>
+                <span class="badge bg-warning">{{empresa.publico_alvo}}</span>
+                <br><br>
+                <h4 style="color: #92D5EB">Indicadores |</h4>
+                
+                <div class="row justify-content-center">
+                    {% for metrica in metricas %}
+                      <div class="col-md-3" style="margin-bottom: 10px;">
+                            <div class="dark-color" style="padding: 20px; text-align: center;">
+                                <h5> {{metrica.titulo}}</h5>
+                                <h6>R${{metrica.valor}}</h6>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <hr>
+                <div class="row">
+                    <h4>Faça sua proposta</h4>
+                    <br><br>
+                    <div class="col-md">
+                        <form action="{% url 'realizar_proposta' empresa.id%}" method="POST"> {% csrf_token %}
+                            <input type="number" name="valor" class="form-control" placeholder="Valor para investir">
+                            <br>
+                            <input type="submit" class="btn btn-indigo-normal" value="Salvar">
+                    </div>
+                    <div class="col-md">
+                            <input type="number" name="percentual" class="form-control" placeholder="Percentual desejado">
+                        </form>
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="col-md-5 intereses-investimentos">
+                <video name='demo' controls autoplay width='100%'>
+                    <source src="{{empresa.pitch.url}}" type="video/mp4"></source>
+                </video>
+
+                <hr>
+                    {% for doc in documentos %}
+                        <div class="list_documentos">
+                            <div class="row">
+                                <div class="col-md-2" style="text-align: center">
+                                    <a href="{{doc.arquivo.url}}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" style="color: white;" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+                                            <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
+                                        </svg>
+                                    </a>
+                                    
+                                </div>
+                                <div class="col-md-6"> {{doc.titulo}} </div>
+                                <div class="col-md-4" style="text-align: right;">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                
+            </div>
+        </div>
+    </div>
+    <br><br>
+{% endblock 'body' %}
