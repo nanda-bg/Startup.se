@@ -4,6 +4,10 @@
 
     <link rel="stylesheet" href="{% static 'usuarios/css/usuarios.css' %}">
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+
+
 {% endblock 'head' %}
 
 
@@ -26,8 +30,8 @@
                 <label>Nome</label>
                 <input type="text" name="nome" placeholder="Digite o nome da sua empresa ..." class="form-control">
                 <br>
-                <label>Cnpj</label>
-                <input type="text" name="cnpj" placeholder="Digite o seu CNPJ ..." class="form-control">
+                <label>CNPJ</label>
+                <input type="text" name="cnpj" id="cnpj" placeholder="Digite o seu CNPJ ..." class="form-control">
                 <br>
                 <label>Site</label>
                 <input type="text" name="site" placeholder="Digite o seu site ..." class="form-control">
@@ -46,8 +50,11 @@
                 <input type="date" name="data_final" class="form-control">
                 <br>
                 <label>Qual a porcentagem (%) de equity oferecida em contrapartida ao valor investido?</label>
-                <input type="number" name="percentual_equity" class="form-control">
-                <input type="submit" class="btn btn-lg btn-indigo" value="cadastrar">
+                <input type="number" name="percentual_equity" class="form-control" min="1" max="100">
+                <input type="submit" class="btn btn-lg btn-indigo" value="Cadastrar">
+                <br>
+                <br>
+
 
             </div>
             <div class="col-md">
@@ -55,13 +62,13 @@
                 <label>Qual o estágio da empresa ?</label>
                 <br>
                 <br>
-                <input type="checkbox" name="estagio" value="I"><span>&nbsp&nbsp Tenho apenas uma ideia</span>
+                <input type="radio" name="estagio" value="I"><span>&nbsp&nbsp Tenho apenas uma ideia</span>
                 <br>
-                <input type="checkbox" name="estagio" value="MVP"><span>&nbsp&nbsp Possuo um MVP</span>
+                <input type="radio" name="estagio" value="MVP"><span>&nbsp&nbsp Possuo um MVP</span>
                 <br>
-                <input type="checkbox" name="estagio" value="MVPP"><span>&nbsp&nbsp Possuo um MVP com clientes pagantes</span>
+                <input type="radio" name="estagio" value="MVPP"><span>&nbsp&nbsp Possuo um MVP com clientes pagantes</span>
                 <br>
-                <input type="checkbox" name="estagio" value="E"><span>&nbsp&nbsp Empresa pronta para escalar  </span>
+                <input type="radio" name="estagio" value="E"><span>&nbsp&nbsp Empresa pronta para escalar  </span>
                 <br>
                 <br>
                 <label>Qual área sua startup está inseria ?</label>
@@ -71,14 +78,14 @@
                     {% endfor %}
                 </select>
                 <br>
-                <label>Qual seu público alvo</label>
+                <label>Qual seu público alvo ?</label>
                 <select name="publico_alvo" class="form-select">
                     <option value="BTC">B2C</option>
                     <option value="B2B">B2B</option>
                 </select>
                 <br>
                 <label>Qual valor deseja captar ?</label>
-                <input type="number" name="valor" class="form-control">
+                <input type="text" name="valor" id="valor" class="form-control" placeholder="R$00,00">
                 <br>
                 <label>Envie o pitch de apresentação</label>
                 <input type="file" name="pitch" class="form-control">
@@ -90,3 +97,18 @@
         </div>
     </div>
 {% endblock 'body' %}
+
+
+{% block 'scripts' %}
+    <script>
+        $('#valor').mask('000.000.000.000,00', {reverse: true});
+        $('#cnpj').mask('00.000.000/0000-00');
+        
+        $('form').on('submit', function() {
+            var valor = $('#valor').val();
+            var valorLimpo = valor.replace('.', '').replace(',', '.');
+            $('#valor').val(valorLimpo);
+        })
+
+    </script>
+{% endblock 'scripts' %}

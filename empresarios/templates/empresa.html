@@ -24,20 +24,27 @@
                             </section>
                         {% endfor %}
                     {% endif %}
-                    <div class="col-md-3">
+                    <div class="col-md-3 d-flex justify-content-center align-items-center">
                         <img src="{{empresa.logo.url}}" class="foto-empresa" alt="">
                     </div>
                     <div class="col-md">
-                        <h2>{{empresa.nome}}</h2>
+                        <h1>{{empresa.nome}}</h1>
                         <h4>Percentual captado</h4>
+                        <div class="progress" style="height: 20px; width: 80%">
+                            <div class="progress-bar bg-success"
+                                 style="width:{{percentual_comprado}}%; font-weight: 600; color: black;"> {{percentual_comprado}}% </div>
+                        </div>
                     </div>
                     
                 </div>
                 <br><br>
                 <div class="row">
                     <div class="col-md">
-                        <h2 class="titulo2">XYZ Investidores</h2>
-                        <a href="#" class="sub-fonte">Ver investidores</a>
+                        <h2 class="titulo2">{{investidores}} Investidores</h2>
+                        {% if empresa.data_final_captacao > data_atual %}
+                            <a href="#" id="ver-investidores-link" class="sub-fonte" onclick="mostrarInvestidores()">Ver investidores</a>
+                            <a href="#" id="ver-solicitacoes-link" class="sub-fonte" style="display: none;" onclick="mostrarSolicitacoes()">Ver solicitações de investimento</a>   
+                        {% endif %} 
                     </div>
                     <div class="col-md">
                         <h2 class="titulo2">R${{total_captado}} Captados</h2>
@@ -48,9 +55,9 @@
                 <div class="row">
                     <div class="col-md">
                         <h5>Percentual de equity vendido</h5>
-                        <div class="progress">
+                        <div class="progress" style="height: 20px">
                             <div class="progress-bar bg-primary"
-                                 style="width:{{percentual_vendido}}%"></div>
+                                 style="width:{{percentual_vendido}}%; font-weight: 600; color: black;">{{percentual_vendido}}%</div>
                             <div class="progress-bar bg-success"
                                  style="width: {{empresa.percentual_equity}}%"></div>
                         </div>
@@ -152,17 +159,18 @@
 
                     </div>
                 </div>
-                
             </div>
-            <div class="col-md-5 dark-color intereses-investimentos">
-                <h3>Solicitações de investimentos</h3>
-                <hr>
-                <br>
+
+
+            <div id="solicitacoes-investimentos" class="col-md-5 dark-color intereses-investimentos">
+                    <h3>Solicitações de investimentos</h3>
+                    <hr>
+                    <br>
                     {% for proposta in proposta_investimentos_enviada %}
                         <div class="bg-color-dark card-investimento">
-                            <div class="row">
-                                <div class="col-md">
-                                    <img src="{% static 'geral/img/foto_perfil.webp' %}" class="foto-perfil" alt="">
+                            <div class="row" style="flex: 1; display: flex; align-items: center;">
+                                <div class="col-md" style="flex-shrink: 0; margin-right: 10px;">
+                                    <img src="{% static 'geral/img/foto_perfil.webp' %}" class="foto-perfil" style="height: 70px; width: 70px; display: block; margin-left: 15px" alt="">
                                 </div>
                                 <div class="col-md-5" style="text-align: left">
                                     <span class="sub-fonte">{{proposta.investidor}}</span>
@@ -170,7 +178,6 @@
                                     <span class="sub-fonte2">R${{proposta.valor}}</span>
                                     <br>
                                     <span class="sub-fonte2"> {{proposta.percentual}}%
-
                                         {% if proposta.valuation|floatformat >= empresa.valuation %}
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-up-fill" style="color: #00ff00;" viewBox="0 0 16 16">
                                                 <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
@@ -181,20 +188,97 @@
                                                 <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
                                             </svg>
                                         {% endif %}
-                                        
+                                            
                                     </span>
                                 </div>
                                 <div class="col-md">
-                                    <a href="{% url 'gerenciar_proposta' proposta.id %}?acao=aceitar" class="btn btn-indigo-normal">Aceitar</a>
+                                    <a href="{% url 'gerenciar_proposta' proposta.id %}?acao=aceitar" class="btn btn-indigo-normal" style="width: 75px; display: inline-block; text-align: center;">Aceitar</a>
                                     <br>
-                                    <a href="{% url 'gerenciar_proposta' proposta.id %}?acao=negar"  style="margin-top: 5px;" class="btn btn-danger">Negar</a>
+                                    <a href="{% url 'gerenciar_proposta' proposta.id %}?acao=negar"  style="margin-top: 5px;" class="btn btn-danger" style="width: 75px; display: inline-block; text-align: center;">Negar</a>
                                 </div>
                             </div>
                         </div>
                         <br>
                     {% endfor %}
-                
+            </div>
+
+            <div id="investidores" class="col-md-5 dark-color intereses-investimentos" style="display:none;">
+                    <h3>Investidores</h3>
+                    <hr>
+                    <br>
+                        {% for proposta in proposta_investimentos_aceitas %}
+                            <div class="bg-color-dark card-investimento" style="display: flex; align-items: center; padding-left: 15px;">
+                                <div class="row" style="flex: 1; display: flex; align-items: center;">
+                                    <div class="col-md-auto" style="flex-shrink: 0; margin-right: 10px;">
+                                        <img src="{% static 'geral/img/foto_perfil.webp' %}" class="foto-perfil" style="height: 70px; width: 70px; display: block; margin-left: 15px" alt="">
+                                    </div>
+                                    <div class="col-md-5" style="text-align: left">
+                                        <span class="sub-fonte">{{proposta.investidor}}</span>
+                                        <br>
+                                        <span class="sub-fonte2">R${{proposta.valor}}</span>
+                                        <br>
+                                        <span class="sub-fonte2"> {{proposta.percentual}}%
+                                        
+
+                                        {% if proposta.valuation > empresa_valuation %}
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-up-fill" style="color: #00ff00;" viewBox="0 0 16 16">
+                                                <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
+                                            </svg>
+
+                                        {% else %}
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" style="color: #ff0000;" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
+                                                <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+                                            </svg>
+                                        {% endif %}
+                                            
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                        {% endfor %}
             </div>
         </div>
     </div>
 {% endblock 'body' %}
+
+
+{% block 'scripts' %}
+    <script>
+        function mostrarInvestidores() {
+          document.getElementById('investidores').style.display = 'block';
+          document.getElementById('solicitacoes-investimentos').style.display = 'none';
+          document.getElementById('ver-investidores-link').style.display = 'none';
+          document.getElementById('ver-solicitacoes-link').style.display = 'block';
+        }
+  
+        function mostrarSolicitacoes() {
+          document.getElementById('investidores').style.display = 'none';
+          document.getElementById('solicitacoes-investimentos').style.display = 'block';
+          document.getElementById('ver-investidores-link').style.display = 'block';
+          document.getElementById('ver-solicitacoes-link').style.display = 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var exibirInvestidoresInicialmente = {{ exibir_investidores_inicialmente|lower|safe }};
+
+            if (exibirInvestidoresInicialmente) {
+                mostrarInvestidores();
+            } else {
+                mostrarSolicitacoes();
+            }
+
+          document.getElementById('ver-investidores-link').addEventListener('click', function (e) {
+            e.preventDefault();
+            mostrarInvestidores();
+          });
+  
+          document.getElementById('ver-solicitacoes-link').addEventListener('click', function (e) {
+            e.preventDefault();
+            mostrarSolicitacoes();
+          });
+        });
+      </script>
+    
+{% endblock 'scripts' %}
+

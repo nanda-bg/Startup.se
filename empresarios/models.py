@@ -43,8 +43,11 @@ class Empresas(models.Model):
     @property
     def status(self):
         if date.today() > self.data_final_captacao:
-            return mark_safe('<span class="badge bg-success"> Captação finalizada </span>')
-        return mark_safe('<span class="badge bg-primary"> Em captação </span>')
+            return "Captação finalizada"
+            
+        return "Em captação"
+        #     return mark_safe('<span class="badge bg-success"> Captação finalizada </span>')
+        # return mark_safe('<span class="badge bg-primary"> Em captação </span>')
 
     @property
     def valuation(self):

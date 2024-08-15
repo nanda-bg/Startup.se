@@ -2,10 +2,13 @@
 {% load static %}
 {% block 'head' %}
 
-<link rel="stylesheet" href="{% static 'empresarios/css/listar_empresas.css' %}">
-<link rel="stylesheet" href="{% static 'empresarios/css/empresa.css' %}">
-<link rel="stylesheet" href="{% static 'usuarios/css/usuarios.css' %}">
-<link rel="stylesheet" href="{% static 'investidores/css/investidores.css' %}">
+    <link rel="stylesheet" href="{% static 'empresarios/css/listar_empresas.css' %}">
+    <link rel="stylesheet" href="{% static 'empresarios/css/empresa.css' %}">
+    <link rel="stylesheet" href="{% static 'usuarios/css/usuarios.css' %}">
+    <link rel="stylesheet" href="{% static 'investidores/css/investidores.css' %}">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 
 {% endblock 'head' %}
 
@@ -28,22 +31,24 @@
                         e ter maiores possíbilidades de retorno.</p>
                     <select name="tipo" id="" class="form-select">
                         <option value="C">Conservador</option>
+                        <option value="M">Moderado</option>
                         <option value="D">Despojado</option>
                     </select>
                     <br>
                     <h3>Áreas de interesses</h3>
                     <p>Selecione as áreas de mercado que possui interesse em investir</p>
-                    <select name="area" id="" class="form-select" multiple>
-                        {% for area in areas %}
-                            <option value="{{area.0}}">{{area.1}}</option>
-                        {% endfor %}
-                    </select>
+                    {% for area in areas %}
+                        <div>
+                            <input type="checkbox" name="area" value="{{area.0}}" id="area_{{area.0}}">
+                            <label for="area_{{area.0}}">{{area.1}}</label>
+                        </div>
+                    {% endfor %}
                     <br>
                     <h3>Valor que deseja investir</h3>
                     <p>Coloque o valor máximo que deseja investir</p>
-                    <input type="number" name="valor" class="form-control" placeholder="00,00">
+                    <input type="text" name="valor" id="valor" class="form-control" placeholder="R$00,00">
                     <br>
-                    <input type="submit" class="btn btn-indigo">
+                    <input type="submit" class="btn btn-indigo" value="Buscar">
                 </form>
             </div>
             
@@ -52,20 +57,56 @@
         <br>
         <br>
 
-        <div class="row">
-            {% for empresa in empresas %}
-                <div class="col-md">
-                    <div class="card dark-color" style="width: 18rem; border: none;" >
-                        <img class="card-img-top dark-color" src="{{empresa.logo.url}}" alt="Card image cap">
-                        <div class="card-body dark-color">
-                        <h5 class="card-title">{{empresa.nome}}</h5>
-                        <p class="card-text">{{empresa.descricao}}</p>
-                        <a href="{% url 'ver_empresa' empresa.id %}" class="btn btn-indigo">Acessar</a>
+        <div class="container">
+            {% if empresas|length == 0 %}
+            <div style="display: flex; flex: 1; justify-content:center; align-items: center; height:100px;">
+                <h4>  Nenhuma empresa encontrada </h4>
+            </div>
+            {% else %}
+            <div class="row">
+                {% for empresa in empresas %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card dark-color" style="width: 100%; border: none; height: 450px;">
+                            <div style="display: flex; align-items: center; justify-content: center; height: 150px;">
+                                <img class="card-img-top dark-color" src="{{empresa.logo.url}}" alt="Card image cap" 
+                                style="height: 150px; object-fit: fill;">
+                            </div>
+                            <div class="card-body dark-color" style="display: flex; flex-direction: column; height: 100%;">
+                                <h5 class="card-title">{{empresa.nome}}</h5>
+                                <p class="card-text"
+                                style="flex: 1;
+                                       line-height: 1.55;
+                                       -webkit-box-orient: vertical;
+                                       display: -webkit-box;
+                                       text-overflow: ellipsis;
+                                       overflow: hidden !important;
+                                       -webkit-line-clamp: 7;">
+                                    {{empresa.descricao}}
+                                </p>
+                                <a href="{% url 'ver_empresa' empresa.id %}" class="btn btn-indigo mt-auto">Acessar</a>
+                            </div>
                         </div>
                     </div>
-                </div>
-            {% endfor %}
-
+                {% endfor %}
+            </div>
         </div>
+
+        {% endif %}
+        
+        
+
+
     </div>
 {% endblock 'body' %}
+
+{% block 'scripts' %}
+    <script>
+        $('#valor').mask('000.000.000.000,00', {reverse: true});
+        
+        $('form').on('submit', function() {
+            var valor = $('#valor').val();
+            var valorLimpo = valor.replace('.', '').replace(',', '.');
+            $('#valor').val(valorLimpo);
+        })
+    </script>
+{% endblock 'scripts' %}

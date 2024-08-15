@@ -9,6 +9,7 @@
 body{
     color: white !important;
     background-color: var(--main-color) !important;
+    font-family: 'Inter', sans-serif;
 }
 
 .bg-color-dark{

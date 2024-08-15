@@ -37,22 +37,70 @@
               </tr>
             </thead>
             <tbody>
-                {% for empresa in empresas %}
-                    <tr class="linha">
-                        <td class="linha">{{empresa.nome}}</td>
-                        <td class="linha">
-                            <div class="progress">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+            {% for item in empresas_e_percentual %}
+                <tr class="linha">
+                    <td class="linha">{{item.empresa.nome}}</td>
+                    <td class="linha">
+
+
+                        {% if item.percentual_vendido >= 80 %}
+                            
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar bg-success" 
+                                    role="progressbar" 
+                                    style="width: {{item.percentual_vendido}}%; color: black; font-weight: 600 " 
+                                    aria-valuenow="{{item.percentual_vendido}}" 
+                                    aria-valuemin="0" 
+                                    aria-valuemax="100">
+                                    {{item.percentual_vendido}}%
+                                </div>
                             </div>
-                        </td>
-                        <td class="linha">{{empresa.status}}</td>
-                        <td class="linha">
-                            <a href="{% url 'empresa' empresa.id %}" class="btn btn-indigo-normal">
-                                Abrir
-                            </a>
-                        </td>
-                    </tr>
-                {% endfor %}
+                            <td class="linha"> 
+                                    <span class="badge bg-success"> {{item.empresa.status}} </span>
+                            </td>
+                        
+                        {% elif item.empresa.status == "Em captação" %}
+
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar bg-primary" 
+                                    role="progressbar" 
+                                    style="width: {{item.percentual_vendido}}%; color: black; font-weight: 600 " 
+                                    aria-valuenow="{{item.percentual_vendido}}" 
+                                    aria-valuemin="0" 
+                                    aria-valuemax="100">
+                                    {{item.percentual_vendido}}%
+                                </div>
+                            </div>
+                            <td class="linha"> 
+                                <span class="badge bg-primary"> {{item.empresa.status}} </span>
+                            </td>
+                        
+                        {% else %}
+
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar bg-danger" 
+                                    role="progressbar" 
+                                    style="width: {{item.percentual_vendido}}%; color: black; font-weight: 600 " 
+                                    aria-valuenow="{{item.percentual_vendido}}" 
+                                    aria-valuemin="0" 
+                                    aria-valuemax="100">
+                                    {{item.percentual_vendido}}%
+                                </div>
+                            </div>
+                            <td class="linha"> 
+                                <span class="badge bg-danger"> {{item.empresa.status}} </span>
+                            </td>
+
+                        {% endif %}
+
+                    </td>
+                    <td class="linha">
+                        <a href="{% url 'empresa' item.empresa.id %}" class="btn btn-indigo-normal">
+                            Abrir
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
             </tbody>
           </table>
     </div>

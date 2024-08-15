@@ -14,19 +14,23 @@ def sugestao(request):
     areas = Empresas.area_choices
 
     if request.method == "GET":   
-        return render(request, 'sugestao.html', {'areas': areas})
+        empresas = Empresas.objects.all()
+        return render(request, 'sugestao.html', {'areas': areas,
+                                                 'empresas': empresas})
     
     elif request.method == "POST":
         tipo = request.POST.get('tipo')
         area = request.POST.getlist('area')
         valor = request.POST.get('valor')
 
-        if tipo == 'C':
-            empresas = Empresas.objects.filter(tempo_existencia = '+5').filter(estagio = "E")
-        elif tipo == 'D':
-            empresas = Empresas.objects.filter(tempo_existencia__in = ['-6', '+6', '+1']).exclude(estagio = "E")
 
-        #Tipo genérico de investidor
+        if tipo == 'C':
+            empresas = Empresas.objects.filter(tempo_existencia='+5').filter(estagio='E')
+        elif tipo == 'M': 
+            empresas = Empresas.objects.filter(tempo_existencia__in=['+1', '+5']).filter(estagio__in=['MVPP', 'MVP', 'E'])
+        elif tipo == 'D':
+            empresas = Empresas.objects.filter(tempo_existencia__in=['-6', '+6', '+1']).exclude(estagio='E')
+
         
         empresas = empresas.filter(area__in = area)
         
@@ -56,9 +60,10 @@ def ver_empresa(request, id):
 
     percentual_disponivel = empresa.percentual_equity - percentual_vendido
 
+    percentual_comprado = (percentual_vendido/empresa.percentual_equity) * 100
+
     valuation_esperado_formatado = locale.format_string('%.2f', float(empresa.valuation), grouping=True)
 
-    #listar as métricas
     metricas = Metricas.objects.filter(empresa = empresa)
 
 
@@ -68,7 +73,8 @@ def ver_empresa(request, id):
                                                 'concretizado': concretizado,
                                                 'percentual_disponivel': percentual_disponivel,
                                                 'valuation_esperado': valuation_esperado_formatado,
-                                                'metricas': metricas})
+                                                'metricas': metricas,
+                                                'percentual_comprado': int(percentual_comprado)})
 
 @login_required(login_url='http://127.0.0.1:8000/usuarios/logar/')
 def realizar_proposta(request, id):
@@ -119,7 +125,7 @@ def assinar_contrato(request, id):
         
 
         #Validação se rg e selfie são da msm pessoa
-        
+
 
         proposta.selfie = selfie
         proposta.rg = rg
@@ -128,3 +134,4 @@ def assinar_contrato(request, id):
 
         messages.add_message(request, constants.SUCCESS, f'Contrato assinado com sucesso, sua proposta foi enviada a empresa.')
         return redirect(f'/investidores/ver_empresa/{proposta.empresa.id}')
+
