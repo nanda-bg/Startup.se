@@ -6,6 +6,9 @@
 <link rel="stylesheet" href="{% static 'empresarios/css/empresa.css' %}">
 <link rel="stylesheet" href="{% static 'usuarios/css/usuarios.css' %}">
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+
 {% endblock 'head' %}
 
 
@@ -117,15 +120,16 @@
                         <hr>
 
                         <div class="row">
+                            <h3> Adicionar métricas </h3>
                             <div class="col-md">
                                 <form action="{% url 'add_metrica' empresa.id %}" method="POST"> {% csrf_token %}
                                 <label>Titulo</label>
-                                <input type="text" class="form-control" name="titulo" placeholder="Adicione um texto ...">
+                                <input type="text" class="form-control" name="titulo" placeholder="Adicione um texto...">
                                 
                             </div>
                             <div class="col-md">
                                 <label>Valor</label>
-                                <input type="text" class="form-control" name="valor" placeholder="Adicione um valor ...">
+                                <input type="text" class="form-control" name="valor" id="valor" placeholder="R$ 00,00">
                             </div>
                             
                         </div>
@@ -141,7 +145,7 @@
                             <div class="list_documentos">
                                 <div class="row">
                                     <div class="col-md-2" style="text-align: center">
-                                        <span>R${{metrica.valor}}</span>
+                                        <span class=".valor_metricas">R${{metrica.valor|floatformat:2}}</span>
                                     </div>
                                     <div class="col-md-6" style= "text-align: center;"> {{metrica.titulo}} </div>
                                     <div class="col-md-4" style="text-align: right;">
@@ -175,7 +179,7 @@
                                 <div class="col-md-5" style="text-align: left">
                                     <span class="sub-fonte">{{proposta.investidor}}</span>
                                     <br>
-                                    <span class="sub-fonte2">R${{proposta.valor}}</span>
+                                    <span class="sub-fonte2 valor_propostas">{{proposta.valor}}</span>
                                     <br>
                                     <span class="sub-fonte2"> {{proposta.percentual}}%
                                         {% if proposta.valuation|floatformat >= empresa.valuation %}
@@ -215,7 +219,7 @@
                                     <div class="col-md-5" style="text-align: left">
                                         <span class="sub-fonte">{{proposta.investidor}}</span>
                                         <br>
-                                        <span class="sub-fonte2">R${{proposta.valor}}</span>
+                                        <span class="sub-fonte2 valor_propostas">{{proposta.valor}}</span>
                                         <br>
                                         <span class="sub-fonte2"> {{proposta.percentual}}%
                                         
@@ -277,6 +281,44 @@
             e.preventDefault();
             mostrarSolicitacoes();
           });
+        });
+
+
+
+        $('#valor').mask('000.000.000.000,00', {reverse: true});
+        
+        $('form').on('submit', function() {
+            var valor = $('#valor').val();
+            var valorLimpo = valor.replace('.', '').replace(',', '.');
+            $('#valor').val(valorLimpo);
+        })
+
+
+
+        function formatarValor(valor) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(valor);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Atualiza a formatação dos valores de métricas
+            document.querySelectorAll('.list_documentos .col-md-2 span').forEach(function (element) {
+                var valor = parseFloat(element.textContent.replace('R$', '').replace('.', '').replace(',', '.'));
+                element.textContent = formatarValor(valor);
+            });
+
+            // Atualiza a formatação dos valores das propostas
+            document.querySelectorAll('.card-investimento .valor_metricas').forEach(function (element) {
+                var valor = parseFloat(element.textContent.replace('R$', '').replace('.', '').replace(',', '.'));
+                element.textContent = formatarValor(valor);
+            });
+
+            document.querySelectorAll('.card-investimento .valor_propostas').forEach(function (element) {
+                var valor = parseFloat(element.textContent.replace('R$', '').replace('.', '').replace(',', '.'));
+                element.textContent = formatarValor(valor);
+            });
         });
       </script>
     

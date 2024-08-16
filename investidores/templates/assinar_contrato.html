@@ -45,8 +45,10 @@
 
         </div>
         <form action="{% url 'assinar_contrato' proposta.id %}" enctype='multipart/form-data' method="POST" style="margin-top: 20px;"> {% csrf_token %}
+            <label for="selfie"> Anexe uma selfie </label>
             <input type="file" name="selfie" class="form-control" style="width: 40%">
             <br>
+            <label for="rg"> Anexe seu documento de identidade </label>
             <input type="file" name="rg" class="form-control" style="width: 40%">
             <br>
             <input type="submit" class="btn btn-indigo-normal" value="Assinar contrato">

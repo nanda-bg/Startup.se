@@ -1,4 +1,5 @@
 from datetime import datetime, date
+import math
 from pyexpat.errors import messages
 import re
 import traceback
@@ -150,8 +151,7 @@ def empresa(request, id):
     empresa = Empresas.objects.get(id=id)
 
     if empresa.user != request.user:
-        if request.user.is_authenticated:
-            messages.add_message(request, constants.ERROR, 'Acesso negado')
+        messages.add_message(request, constants.ERROR, 'Acesso negado')
         return redirect('/empresarios/listar_empresas')
     
     if request.method == "GET":
@@ -172,7 +172,7 @@ def empresa(request, id):
         valuation_atual = (100 * float(total_captado)) / float(percentual_vendido) if percentual_vendido > 0 else 0
         valuation_atual_formatado = locale.format_string('%.2f', valuation_atual, grouping=True)
 
-        valuation_esperado_formatado = locale.format_string('%.2f', float(empresa.valuation), grouping=True)
+        valuation_esperado_formatado = locale.format_string('%.2f', math.ceil(float(empresa.valuation)), grouping=True)
 
         proposta_investimentos_enviada = proposta_investimentos.filter(status='PE')
         proposta_investimentos_aceitas = proposta_investimentos.filter(status='PA')
@@ -254,9 +254,15 @@ def add_metrica(request, id):
     titulo = request.POST.get('titulo')
     valor = request.POST.get('valor')
 
+    if empresa.user != request.user:
+        messages.add_message(request, constants.ERROR, 'Acesso negado')
+        return redirect('/empresarios/empresa/{empresa.id}')
+
+    valor = valor.replace('.', '')
+
     metrica = Metricas(empresa = empresa,
                        titulo = titulo,
-                       valor = valor)
+                       valor = float(valor))
     
     metrica.save()
 
@@ -282,6 +288,10 @@ def gerenciar_proposta(request, id):
     acao = request.GET.get('acao')
     proposta = PropostaInvestimento.objects.get(id = id)
     empresa = proposta.empresa
+
+    if empresa.user != request.user:
+        messages.add_message(request, constants.ERROR, 'Acesso negado')
+        return redirect('/empresarios/empresa/{empresa.id}')
 
     if acao == 'aceitar':
         messages.add_message(request, constants.SUCCESS, 'Proposta aceita')

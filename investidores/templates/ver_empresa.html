@@ -7,6 +7,9 @@
 	<link rel="stylesheet" href="{% static 'usuarios/css/usuarios.css' %}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap-icons.css">
 
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 	
 {% endblock 'head' %}
 
@@ -75,34 +78,35 @@
                 <br>
                 <span class="badge bg-warning">{{empresa.publico_alvo}}</span>
                 <br><br>
-                <h4 style="color: #92D5EB">Indicadores |</h4>
-                
-                <div class="row justify-content-center">
-                    {% for metrica in metricas %}
-                      <div class="col-md-3" style="margin-bottom: 10px;">
-                            <div class="dark-color" style="padding: 20px; text-align: center;">
-                                <h5> {{metrica.titulo}}</h5>
-                                <h6>R${{metrica.valor}}</h6>
+                {% if empresas|length > 0 %}
+                    <h4 style="color: #92D5EB">Indicadores |</h4>
+                    <div class="row justify-content-center">
+                        {% for metrica in metricas %}
+                        <div class="col-md-3" style="margin-bottom: 10px;">
+                                <div class="dark-color" style="padding: 20px; text-align: center;">
+                                    <h5> {{metrica.titulo}}</h5>
+                                    <h6 class="valor_metricas">{{metrica.valor}}</h6>
+                                </div>
                             </div>
-                        </div>
-                    {% endfor %}
-                </div>
-
+                        {% endfor %}
+                    </div>
+                {% endif %}
                 <hr>
                 <div class="row">
-                    <h4>Faça sua proposta</h4>
-                    <br><br>
-                    <div class="col-md">
-                        <form action="{% url 'realizar_proposta' empresa.id%}" method="POST"> {% csrf_token %}
-                            <input type="number" name="valor" class="form-control" placeholder="Valor para investir">
-                            <br>
-                            <input type="submit" class="btn btn-indigo-normal" value="Salvar">
-                    </div>
-                    <div class="col-md">
-                            <input type="number" name="percentual" class="form-control" placeholder="Percentual desejado">
-                        </form>
-                    </div>
-                    
+                    {% if empresa.status == "Em captação" %}
+                        <h4>Faça sua proposta</h4>
+                        <br><br>
+                        <div class="col-md">
+                            <form action="{% url 'realizar_proposta' empresa.id%}" method="POST"> {% csrf_token %}
+                                <input type="text" name="valor" id="valor" class="form-control" placeholder="Valor para investir">
+                                <br>
+                                <input type="submit" class="btn btn-indigo-normal" value="Salvar">
+                        </div>
+                        <div class="col-md">
+                                <input type="number" name="percentual" min="1" max="{{ percentual_disponivel|floatformat:0 }}" class="form-control" placeholder="Percentual desejado">
+                            </form>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
             <div class="col-md-5 intereses-investimentos">
@@ -136,3 +140,37 @@
     </div>
     <br><br>
 {% endblock 'body' %}
+
+{% block 'scripts' %}
+    <script>
+        $('#valor').mask('000.000.000.000,00', {reverse: true});
+        
+        $('form').on('submit', function() {
+            var valor = $('#valor').val();
+            var valorLimpo = valor.replace('.', '').replace(',', '.');
+            $('#valor').val(valorLimpo);
+        })
+        
+
+        $(document).ready(function() {
+            // Função para formatar números como moeda
+            function formatCurrency(value) {
+                // Remove todos os caracteres não numéricos
+                value = value.replace(/\D/g, '');
+
+                // Adiciona o separador de milhares e decimais
+                return 'R$ ' + value.replace(/(\d)(\d{8})$/, '$1.$2')
+                                    .replace(/(\d)(\d{5})$/, '$1.$2')
+                                    .replace(/(\d)(\d{2})$/, '$1,$2');
+            }
+        
+            // Seleciona todos os elementos com a classe 'valor_metricas' e formata o texto
+            $('.valor_metricas').each(function() {
+                var text = $(this).text().replace('R$', '').trim();
+                $(this).text(formatCurrency(text));
+            });
+        });
+
+        
+    </script>
+{% endblock 'scripts' %}
