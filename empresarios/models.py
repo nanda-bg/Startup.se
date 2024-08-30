@@ -22,7 +22,7 @@ class Empresas(models.Model):
         ('FT', 'Fintech'),
         ('AT', 'Agrotech'),
     )
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     nome = models.CharField(max_length=50)
     cnpj = models.CharField(max_length=30)
     site = models.URLField()
