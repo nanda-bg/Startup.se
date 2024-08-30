@@ -1,4 +1,5 @@
-from datetime import datetime, date
+from datetime import datetime, date, timedelta, timezone
+from django.utils import timezone
 import math
 from pyexpat.errors import messages
 import re
@@ -307,3 +308,30 @@ def gerenciar_proposta(request, id):
     proposta.save()
     
     return redirect(f'/empresarios/empresa/{empresa.id}')
+
+def dashboard(request, id):
+    empresa = Empresas.objects.get(id = id)
+    today = timezone.now().date()
+
+    seven_days_ago = today - timedelta(days = 6)
+
+    propostas_por_dia = {}
+
+    for i in range(7):
+        day = seven_days_ago + timedelta(days = i)
+
+        propostas = PropostaInvestimento.objects.filter(
+            empresa = empresa.id,
+            status = 'PA',
+            data = day
+        )
+
+        total_dia = 0
+        for proposta in propostas:
+            total_dia += proposta.valor
+        
+        propostas_por_dia[day.strftime('%d/%m/%Y')] = int(total_dia)
+
+    return render(request, 'dashboard.html', {'labels': list(propostas_por_dia.keys()), 
+                                              'values': list(propostas_por_dia.values())
+                                              })

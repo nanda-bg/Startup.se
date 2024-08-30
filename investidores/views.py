@@ -115,7 +115,8 @@ def realizar_proposta(request, id):
         valor = valor,
         percentual = percentual,
         empresa = empresa,
-        investidor = request.user
+        investidor = request.user,
+        data = date.today()
     )
 
     proposta.save()
