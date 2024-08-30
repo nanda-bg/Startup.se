@@ -11,7 +11,11 @@ from django.contrib.messages import constants
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import default_storage
 import locale
-locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+
+try:
+    locale.setlocale(locale.LC_ALL, 'pt_BR')
+except locale.Error:
+    locale.setlocale(locale.LC_ALL, '')
 
 @login_required(login_url='http://127.0.0.1:8000/usuarios/logar/')
 def cadastrar_empresa(request):
