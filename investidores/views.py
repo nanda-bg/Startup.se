@@ -185,5 +185,3 @@ def assinar_contrato(request, id):
             messages.add_message(request, constants.WARNING, 'Erro de validação, tente novamente.')
 
         return redirect(f'/investidores/ver_empresa/{proposta.empresa.id}')
-
-
