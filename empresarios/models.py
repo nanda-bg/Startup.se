@@ -55,7 +55,7 @@ class Empresas(models.Model):
     
 
 class Documento(models.Model):
-    empresa = models.ForeignKey(Empresas, on_delete=models.DO_NOTHING)
+    empresa = models.ForeignKey(Empresas, on_delete=models.CASCADE)
     titulo = models.CharField(max_length=30)
     arquivo = models.FileField(upload_to="documentos")
 
@@ -63,7 +63,7 @@ class Documento(models.Model):
         return self.titulo
     
 class Metricas(models.Model):
-    empresa = models.ForeignKey(Empresas, on_delete=models.DO_NOTHING)
+    empresa = models.ForeignKey(Empresas, on_delete=models.CASCADE)
     titulo = models.CharField(max_length=30)
     valor = models.FloatField()
 
