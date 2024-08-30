@@ -1,7 +1,7 @@
 from datetime import date
 import locale
 import math
-locale.setlocale(locale.LC_ALL, 'pt_BR')
+locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
 from django.http import Http404
 from django.shortcuts import redirect, render
