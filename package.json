@@ -1,5 +1,13 @@
 {
   "dependencies": {
     "bootstrap-icons": "^1.11.3"
+  },
+
+  "build": {
+    "command": "pip install -r requirements.txt"
+  },
+
+  "start": {
+    "command": "gunicorn myproject.wsgi:application --bind 0.0.0.0:8000"
   }
 }
